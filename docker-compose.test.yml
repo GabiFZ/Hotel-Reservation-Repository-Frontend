@@ -1,0 +1,6 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    command: npm run test:run
