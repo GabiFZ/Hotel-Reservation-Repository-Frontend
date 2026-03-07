@@ -1,19 +1,14 @@
 import { useState } from 'react'
 import './App.css'
+import RoomList from "./components/RoomList";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <h1>Hotel Reservation System</h1>
-      <div className="card">
-        <button onClick={() => setCount(count + 1)}>
-          count is {count}
-        </button>
-      </div>
-    </>
-  )
+    return (
+        <div>
+            <h1>Hotel Rooms</h1>
+            <RoomList />
+        </div>
+    );
 }
 
 export default App
