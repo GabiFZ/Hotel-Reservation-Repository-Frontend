@@ -1,22 +1,35 @@
 import { useEffect, useState } from "react";
 import { getRooms, deleteRoom } from "../services/api";
+import RoomForm from "./RoomForm";
 
 export default function RoomList() {
+
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [editingRoom, setEditingRoom] = useState(null);
-    const [refresh, setRefresh] = useState(false);
 
     const loadRooms = () => {
         setLoading(true);
+
         getRooms()
-            .then((data) => { setRooms(data); setLoading(false); })
-            .catch((err) => { setError(err.message); setLoading(false); });
+            .then((data) => {
+                setRooms(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                setError(err.message);
+                setLoading(false);
+            });
     };
+
+    useEffect(() => {
+        loadRooms();
+    }, []);
 
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this room?")) return;
+
         try {
             await deleteRoom(id);
             loadRooms();
@@ -25,16 +38,28 @@ export default function RoomList() {
         }
     };
 
-    useEffect(() => {
+    const handleEdit = (room) => {
+        setEditingRoom(room);
+    };
+
+    const handleSuccess = () => {
+        setEditingRoom(null);
         loadRooms();
-    }, []);
+    };
 
     if (loading) return <p>Loading rooms...</p>;
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <table border="1">
-            <thead>
+        <div>
+
+            <RoomForm
+                existingRoom={editingRoom}
+                onSuccess={handleSuccess}
+            />
+
+            <table border="1">
+                <thead>
                 <tr>
                     <th>ID</th>
                     <th>Type</th>
@@ -43,8 +68,9 @@ export default function RoomList() {
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+
+                <tbody>
                 {rooms.map((room) => (
                     <tr key={room.id}>
                         <td>{room.id}</td>
@@ -53,11 +79,22 @@ export default function RoomList() {
                         <td>{room.price}</td>
                         <td>{room.status}</td>
                         <td>
-                            <button onClick={() => handleDelete(room.id)}>Delete</button>
+
+                            <button onClick={() => handleEdit(room)}>
+                                Edit
+                            </button>
+
+                            <button onClick={() => handleDelete(room.id)}>
+                                Delete
+                            </button>
+
                         </td>
                     </tr>
                 ))}
-            </tbody>
-        </table>
+                </tbody>
+
+            </table>
+
+        </div>
     );
 }

@@ -1,50 +1,63 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { addRoom, updateRoom } from "../services/api";
 
 function RoomForm({ existingRoom, onSuccess }) {
-    const [roomType, setRoomType] = useState(existingRoom?.roomType || "");
-    const [beds, setBeds] = useState(existingRoom?.beds || "");
-    const [price, setPrice] = useState(existingRoom?.price || "");
-    const [message, setMessage] = useState(""); // mesaj de feedback
-    const [error, setError] = useState(false);  // true dacă e eroare
+    const [roomType, setRoomType] = useState("");
+    const [beds, setBeds] = useState("");
+    const [price, setPrice] = useState("");
+    const [status, setStatus] = useState("AVAILABLE"); // status select
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState(false);
+
+
+    useEffect(() => {
+        if (existingRoom) {
+            setRoomType(existingRoom.roomType);
+            setBeds(existingRoom.beds);
+            setPrice(existingRoom.price);
+            setStatus(existingRoom.status);
+        } else {
+            setRoomType("");
+            setBeds("");
+            setPrice("");
+            setStatus("AVAILABLE");
+        }
+    }, [existingRoom]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validare simplă
         if (!roomType || !beds || !price) {
             setMessage("All fields are required");
             setError(true);
             return;
         }
 
-        const room = { roomType, beds: Number(beds), price: Number(price), status: "AVAILABLE" };
+        const room = {
+            roomType,
+            beds: Number(beds),
+            price: Number(price),
+            status
+        };
 
         try {
-            const url = existingRoom
-                ? `http://localhost:8080/rooms/${existingRoom.id}`
-                : "http://localhost:8080/rooms";
-
-            const method = existingRoom ? "PUT" : "POST";
-
-            const response = await fetch(url, {
-                method: method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(room),
-            });
-
-            if (!response.ok) throw new Error("Request failed");
+            if (existingRoom) {
+                await updateRoom(existingRoom.id, room);
+            } else {
+                await addRoom(room);
+            }
 
             setMessage(existingRoom ? "Room updated successfully" : "Room created successfully");
             setError(false);
 
-            // resetează câmpurile dacă e creare
             if (!existingRoom) {
                 setRoomType("");
                 setBeds("");
                 setPrice("");
+                setStatus("AVAILABLE");
             }
 
-            // Notifică lista de camere să reîncarce
             if (onSuccess) onSuccess();
 
         } catch (err) {
@@ -74,12 +87,30 @@ function RoomForm({ existingRoom, onSuccess }) {
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                 />
-                <button type="submit">{existingRoom ? "Update Room" : "Create Room"}</button>
+                <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="AVAILABLE">AVAILABLE</option>
+                    <option value="OCCUPIED">OCCUPIED</option>
+                </select>
+
+                <button type="submit">
+                    {existingRoom ? "Update Room" : "Create Room"}
+                </button>
+
+                {existingRoom && (
+                    <button
+                        type="button"
+                        onClick={() => onSuccess()} // resetează form
+                        style={{ marginLeft: "10px" }}
+                    >
+                        Cancel
+                    </button>
+                )}
             </form>
 
-            {/* Afișează mesajul de feedback */}
             {message && (
-                <p style={{ color: error ? "red" : "green", marginTop: "10px" }}>{message}</p>
+                <p style={{ color: error ? "red" : "green", marginTop: "10px" }}>
+                    {message}
+                </p>
             )}
         </div>
     );
