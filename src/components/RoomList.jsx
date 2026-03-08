@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { fetchRooms } from "../services/api";
 
 export default function RoomList() {
     const [rooms, setRooms] = useState([]);
@@ -6,13 +7,7 @@ export default function RoomList() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch("http://localhost:8080/rooms")
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error("Failed to fetch rooms");
-                }
-                return res.json();
-            })
+        fetchRooms()
             .then((data) => {
                 setRooms(data);
                 setLoading(false);

@@ -1,25 +1,23 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { describe, it, expect } from 'vitest'
 import App from '../App'
 
 describe('App Component', () => {
 
-  it('renders main heading', () => {
+  it('renders page heading', () => {
     render(<App />)
+
     expect(
-        screen.getByText(/Hotel Reservation System/i)
+      screen.getByText(/Hotel Rooms/i)
     ).toBeInTheDocument()
   })
 
-  it('button increments counter', async () => {
+  it('shows loading message initially', () => {
     render(<App />)
 
-    const button = screen.getByRole('button')
-
-    await userEvent.click(button)
-
-    expect(button).toHaveTextContent('count is 1')
+    expect(
+      screen.getByText(/Loading rooms/i)
+    ).toBeInTheDocument()
   })
 
 })
