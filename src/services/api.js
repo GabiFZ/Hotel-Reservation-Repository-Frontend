@@ -1,4 +1,9 @@
-const BASE_URL = "http://localhost:8080"
+// Pick base URL based on runtime environment
+const isDev = import.meta.env.MODE === 'development';
+
+export const BASE_URL = isDev 
+  ? 'http://localhost:8080'   
+  : '/api';                      
 
 export async function getRooms() {
   const res = await fetch(`${BASE_URL}/rooms`)

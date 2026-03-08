@@ -8,7 +8,7 @@ describe('App Component', () => {
     render(<App />)
 
     expect(
-      screen.getByText(/Hotel Rooms/i)
+      screen.getByText(/Hotel Reservation System/i)
     ).toBeInTheDocument()
   })
 

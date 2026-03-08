@@ -1,14 +1,21 @@
-import { useState } from 'react'
-import './App.css'
-import RoomList from "./components/RoomList";
+import { useState } from "react";
+import RoomsPage from "./pages/RoomsPage";
+import AddRoomPage from "./pages/AddRoomPage";
 
-function App() {
-    return (
-        <div>
-            <h1>Hotel Rooms</h1>
-            <RoomList />
-        </div>
-    );
+export default function App() {
+  const [page, setPage] = useState("rooms");
+
+  return (
+    <div>
+      <h1>Hotel Reservation System</h1>
+
+      <nav>
+        <button onClick={() => setPage("rooms")}>View Rooms</button>
+        <button onClick={() => setPage("add")}>Add Room</button>
+      </nav>
+
+      {page === "rooms" && <RoomsPage />}
+      {page === "add" && <AddRoomPage />}
+    </div>
+  );
 }
-
-export default App
