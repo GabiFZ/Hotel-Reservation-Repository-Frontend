@@ -33,3 +33,9 @@ export async function updateRoom(id, room) {
 
   return res.json()
 }
+
+export async function deleteRoom(id) {
+  const res = await fetch(`${BASE_URL}/rooms/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Failed to delete room");
+  return true;
+}
