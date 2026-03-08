@@ -5,6 +5,8 @@ export default function RoomList() {
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [editingRoom, setEditingRoom] = useState(null);
+    const [refresh, setRefresh] = useState(false);
 
     const loadRooms = () => {
         setLoading(true);
