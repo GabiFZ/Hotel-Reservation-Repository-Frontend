@@ -1,26 +1,15 @@
 import { useEffect, useState } from "react";
 import { getRooms, deleteRoom } from "../services/api";
 import RoomForm from "./RoomForm";
+import { Table, Button, Badge, Card } from "react-bootstrap";
 
 export default function RoomList() {
 
     const [rooms, setRooms] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [editingRoom, setEditingRoom] = useState(null);
 
     const loadRooms = () => {
-        setLoading(true);
-
-        getRooms()
-            .then((data) => {
-                setRooms(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError(err.message);
-                setLoading(false);
-            });
+        getRooms().then(setRooms);
     };
 
     useEffect(() => {
@@ -28,14 +17,10 @@ export default function RoomList() {
     }, []);
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this room?")) return;
+        if (!window.confirm("Delete this room?")) return;
 
-        try {
-            await deleteRoom(id);
-            loadRooms();
-        } catch (err) {
-            alert(err.message);
-        }
+        await deleteRoom(id);
+        loadRooms();
     };
 
     const handleEdit = (room) => {
@@ -47,10 +32,8 @@ export default function RoomList() {
         loadRooms();
     };
 
-    if (loading) return <p>Loading rooms...</p>;
-    if (error) return <p>Error: {error}</p>;
-
     return (
+
         <div>
 
             <RoomForm
@@ -58,42 +41,76 @@ export default function RoomList() {
                 onSuccess={handleSuccess}
             />
 
-            <table border="1">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Type</th>
-                    <th>Beds</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
+            <Card className="shadow">
 
-                <tbody>
-                {rooms.map((room) => (
-                    <tr key={room.id}>
-                        <td>{room.id}</td>
-                        <td>{room.roomType}</td>
-                        <td>{room.beds}</td>
-                        <td>{room.price}</td>
-                        <td>{room.status}</td>
-                        <td>
+                <Card.Body>
 
-                            <button onClick={() => handleEdit(room)}>
-                                Edit
-                            </button>
+                    <Card.Title>Rooms List</Card.Title>
 
-                            <button onClick={() => handleDelete(room.id)}>
-                                Delete
-                            </button>
+                    <Table striped bordered hover>
 
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
+                        <thead>
 
-            </table>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Beds</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        {rooms.map((room) => (
+
+                            <tr key={room.id}>
+
+                                <td>{room.id}</td>
+                                <td>{room.roomType}</td>
+                                <td>{room.beds}</td>
+                                <td>${room.price}</td>
+
+                                <td>
+                                    <Badge bg={room.status === "AVAILABLE" ? "success" : "danger"}>
+                                        {room.status}
+                                    </Badge>
+                                </td>
+
+                                <td>
+
+                                    <Button
+                                        variant="warning"
+                                        size="sm"
+                                        onClick={() => handleEdit(room)}
+                                    >
+                                        Edit
+                                    </Button>
+
+                                    <Button
+                                        variant="danger"
+                                        size="sm"
+                                        className="ms-2"
+                                        onClick={() => handleDelete(room.id)}
+                                    >
+                                        Delete
+                                    </Button>
+
+                                </td>
+
+                            </tr>
+
+                        ))}
+
+                        </tbody>
+
+                    </Table>
+
+                </Card.Body>
+
+            </Card>
 
         </div>
     );

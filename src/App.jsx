@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import './App.css'
 import RoomList from "./components/RoomList";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Container } from "react-bootstrap";
 
 function App() {
     return (
-        <div>
-            <h1>Hotel Rooms</h1>
+        <Container className="mt-4">
+            <h1 className="text-center mb-4">🏨 Hotel Rooms Management</h1>
             <RoomList />
-        </div>
+        </Container>
     );
 }
 
-export default App
+export default App;
