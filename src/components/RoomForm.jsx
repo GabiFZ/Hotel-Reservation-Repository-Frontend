@@ -1,63 +1,149 @@
-import { useState } from "react";
-import { addRoom } from "../services/api";
+import { useState, useEffect } from "react";
+import { addRoom, updateRoom } from "../services/api";
+import { Form, Button, Card, Alert } from "react-bootstrap";
 
-export default function RoomForm({ onRoomAdded }) {
-  const [roomType, setRoomType] = useState("");
-  const [beds, setBeds] = useState(1);
-  const [price, setPrice] = useState(0);
-  const [status, setStatus] = useState("AVAILABLE");
+function RoomForm({ existingRoom, onSuccess }) {
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const [roomType, setRoomType] = useState("");
+    const [beds, setBeds] = useState("");
+    const [price, setPrice] = useState("");
+    const [status, setStatus] = useState("AVAILABLE");
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState(false);
 
-    const room = { roomType, beds, price, status };
+    useEffect(() => {
 
-    try {
-      await addRoom(room);
-      alert("Room added successfully");
+        if (existingRoom) {
+            setRoomType(existingRoom.roomType);
+            setBeds(existingRoom.beds);
+            setPrice(existingRoom.price);
+            setStatus(existingRoom.status);
+        } else {
+            setRoomType("");
+            setBeds("");
+            setPrice("");
+            setStatus("AVAILABLE");
+        }
 
-      if (onRoomAdded) onRoomAdded();
+    }, [existingRoom]);
 
-      setRoomType("");
-      setBeds(1);
-      setPrice(0);
-      setStatus("AVAILABLE");
-    } catch (err) {
-      alert(err.message);
-    }
-  };
+    const handleSubmit = async (e) => {
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h2>Add Room</h2>
+        e.preventDefault();
 
-      <input
-        placeholder="Room Type"
-        value={roomType}
-        onChange={(e) => setRoomType(e.target.value)}
-        required
-      />
+        if (!roomType || !beds || !price) {
+            setMessage("All fields are required");
+            setError(true);
+            return;
+        }
 
-      <input
-        type="number"
-        placeholder="Beds"
-        value={beds}
-        onChange={(e) => setBeds(e.target.value)}
-      />
+        const room = {
+            roomType,
+            beds: Number(beds),
+            price: Number(price),
+            status
+        };
 
-      <input
-        type="number"
-        placeholder="Price"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-      />
+        try {
 
-      <select value={status} onChange={(e) => setStatus(e.target.value)}>
-        <option value="AVAILABLE">AVAILABLE</option>
-        <option value="OCCUPIED">OCCUPIED</option>
-      </select>
+            if (existingRoom) {
+                await updateRoom(existingRoom.id, room);
+            } else {
+                await addRoom(room);
+            }
 
-      <button type="submit">Add Room</button>
-    </form>
-  );
+            setMessage(existingRoom ? "Room updated successfully" : "Room created successfully");
+            setError(false);
+
+            if (!existingRoom) {
+                setRoomType("");
+                setBeds("");
+                setPrice("");
+                setStatus("AVAILABLE");
+            }
+
+            if (onSuccess) onSuccess();
+
+        } catch {
+            setMessage("Error saving room");
+            setError(true);
+        }
+    };
+
+    return (
+
+        <Card className="mb-4 shadow">
+            <Card.Body>
+
+                <Card.Title>
+                    {existingRoom ? "Edit Room" : "Add Room"}
+                </Card.Title>
+
+                {message && (
+                    <Alert variant={error ? "danger" : "success"}>
+                        {message}
+                    </Alert>
+                )}
+
+                <Form onSubmit={handleSubmit}>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Room Type</Form.Label>
+                        <Form.Control
+                            value={roomType}
+                            onChange={(e) => setRoomType(e.target.value)}
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Beds</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={beds}
+                            onChange={(e) => setBeds(e.target.value)}
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Price</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Status</Form.Label>
+                        <Form.Select
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                        >
+                            <option value="AVAILABLE">AVAILABLE</option>
+                            <option value="OCCUPIED">OCCUPIED</option>
+                        </Form.Select>
+                    </Form.Group>
+
+                    <Button variant="primary" type="submit">
+                        {existingRoom ? "Update Room" : "Create Room"}
+                    </Button>
+
+                    {existingRoom && (
+                        <Button
+                            variant="secondary"
+                            className="ms-2"
+                            onClick={() => onSuccess()}
+                        >
+                            Cancel
+                        </Button>
+                    )}
+
+                </Form>
+
+            </Card.Body>
+        </Card>
+
+    );
 }
+
+export default RoomForm;
