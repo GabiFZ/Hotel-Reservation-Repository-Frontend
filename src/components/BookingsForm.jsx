@@ -40,39 +40,23 @@ export default function BookingsPage() {
   async function handleSubmit(e) {
     e.preventDefault()
 
-    if (!form.firstName || !form.lastName || !form.email) {
-        setMessage("All fields are required")
-        return
-    }
-
     if (form.checkInDate >= form.checkOutDate) {
-        setMessage("Check-out must be after check-in")
-        return
+      setMessage("Check-out must be after check-in")
+      return
     }
 
     const booking = {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        room: { id: form.roomId },
-        checkInDate: form.checkInDate,
-        checkOutDate: form.checkOutDate,
-        price: Number(form.price),
-        status: "RESERVED"
+      user: { id: 1 },
+      room: { id: Number(form.roomId) },
+      checkInDate: form.checkInDate,
+      checkOutDate: form.checkOutDate
     }
 
     try {
+      await createBooking(booking)
+      setMessage("Booking created successfully")
 
-        if (editingId) {
-        await updateBooking(editingId, booking)
-        setMessage("Booking updated successfully")
-        setEditingId(null)
-        } else {
-        await createBooking(booking)
-        setMessage("Booking created successfully")
-        }
-
-        setForm({
+      setForm({
         firstName: "",
         lastName: "",
         email: "",
@@ -80,12 +64,12 @@ export default function BookingsPage() {
         checkInDate: "",
         checkOutDate: "",
         price: ""
-        })
+      })
 
-        loadBookings()
+      loadBookings()
 
     } catch {
-        setMessage("Operation failed")
+      setMessage("Operation failed")
     }
   }
 
