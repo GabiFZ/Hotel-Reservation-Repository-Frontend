@@ -69,7 +69,7 @@ export default function BookingsPage() {
       loadBookings()
 
     } catch {
-      setMessage("Operation failed")
+      setMessage("Operation failed.")
     }
   }
 
