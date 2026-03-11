@@ -88,3 +88,13 @@ export async function updateBooking(id, booking) {
 
   return res.json()
 }
+
+export const getAvailableRooms = async (start, end) => {
+  const res = await fetch(`${BASE_URL}/availability?start=${start}&end=${end}`);
+  if (!res.ok) {
+    const errorText = await res.text(); // better debugging
+    console.error("Availability failed:", res.status, errorText);
+    throw new Error(`Failed to fetch available rooms: ${res.status} - ${errorText}`);
+  }
+  return res.json();
+};
