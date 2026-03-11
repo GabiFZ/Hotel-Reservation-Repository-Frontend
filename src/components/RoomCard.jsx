@@ -1,4 +1,3 @@
-// src/components/RoomCard.jsx
 import React from "react";
 
 const RoomCard = ({ room }) => {

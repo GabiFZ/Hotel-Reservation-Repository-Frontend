@@ -1,7 +1,6 @@
-// src/pages/AvailabilityPage.jsx
 import React, { useState, useEffect } from "react";
-import { getAvailableRooms } from "../services/api"; // your API service
-import RoomCard from "../components/RoomCard"; // optional reusable component
+import { getAvailableRooms } from "../services/api";
+import RoomCard from "../components/RoomCard";
 
 const AvailabilityPage = () => {
   const [checkInDate, setCheckInDate] = useState("");
@@ -11,7 +10,6 @@ const AvailabilityPage = () => {
   const [roomTypeFilter, setRoomTypeFilter] = useState("");
   const [bedsFilter, setBedsFilter] = useState("");
 
-  // Fetch available rooms whenever dates change
   useEffect(() => {
     const fetchRooms = async () => {
       if (!checkInDate || !checkOutDate) return;
@@ -19,7 +17,7 @@ const AvailabilityPage = () => {
       try {
         const data = await getAvailableRooms(checkInDate, checkOutDate);
         setRooms(data);
-        setFilteredRooms(data); // initialize filtered view
+        setFilteredRooms(data); 
       } catch (err) {
         console.error("Error fetching rooms:", err);
       }
@@ -28,7 +26,6 @@ const AvailabilityPage = () => {
     fetchRooms();
   }, [checkInDate, checkOutDate]);
 
-  // Filter rooms whenever filters change
   useEffect(() => {
     let result = [...rooms];
     if (roomTypeFilter) {
