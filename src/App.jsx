@@ -1,16 +1,37 @@
-import { useState } from 'react'
-import './App.css'
-import RoomList from "./components/RoomList";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container } from "react-bootstrap";
+import { useState } from "react";
+import RoomsPage from "./pages/RoomsPage";
+import AddRoomPage from "./pages/AddRoomPage";
+import BookingsForm from "./components/BookingsForm";
+import AvailabilityPage from "./pages/AvailabilityPage";
 
-function App() {
-    return (
-        <Container className="mt-4">
-            <h1 className="text-center mb-4">🏨 Hotel Rooms Management</h1>
-            <RoomList />
-        </Container>
-    );
+export default function App() {
+  const [page, setPage] = useState("rooms");
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Hotel Reservation System</h1>
+
+      <nav className="flex gap-4 mb-6">
+        <button onClick={() => setPage("rooms")} className="border px-4 py-2 rounded">
+          View Rooms
+        </button>
+        <button onClick={() => setPage("add")} className="border px-4 py-2 rounded">
+          Add Room
+        </button>
+        <button onClick={() => setPage("bookings")} className="border px-4 py-2 rounded">
+          Bookings
+        </button>
+        <button onClick={() => setPage("availability")} className="border px-4 py-2 rounded">
+          Availability
+        </button>
+      </nav>
+
+      <div>
+        {page === "rooms" && <RoomsPage />}
+        {page === "add" && <AddRoomPage />}
+        {page === "bookings" && <BookingsForm />}
+        {page === "availability" && <AvailabilityPage />}
+      </div>
+    </div>
+  );
 }
-
-export default App;
