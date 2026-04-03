@@ -1,22 +1,25 @@
-import { render, screen } from "@testing-library/react"
-import { vi } from "vitest"
-import RoomList from "../../components/RoomList"
+import { render, screen, waitFor } from "@testing-library/react";
+import { vi } from "vitest";
+import RoomList from "../../components/RoomList";
 
 vi.mock("../../services/api", () => ({
   getRooms: vi.fn().mockResolvedValue([
     { id: 1, roomType: "Single", beds: 1, price: 100, status: "AVAILABLE" }
   ]),
-  deleteRoom: vi.fn()
-}))
+}));
 
 describe("RoomList", () => {
 
-  it("renders room list", async () => {
+  it("renders rooms list correctly", async () => {
+    render(<RoomList />);
 
-    render(<RoomList />)
-
-    expect(await screen.findByText("Single")).toBeInTheDocument()
-
-  })
-
-})
+    expect(await screen.findByText("Single")).toBeInTheDocument();
+    expect(screen.getByText("$100")).toBeInTheDocument();
+    
+    // Avoid duplicate "1"
+    const roomIds = screen.getAllByText("1");
+    expect(roomIds.length).toBeGreaterThan(0);
+    
+    expect(screen.getAllByText("AVAILABLE").length).toBeGreaterThan(0);
+  });
+});

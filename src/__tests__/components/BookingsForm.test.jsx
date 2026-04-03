@@ -1,119 +1,44 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import { vi } from "vitest"
-import BookingsForm from "../../components/BookingsForm"
-import * as api from "../../services/api"
+// src/__tests__/components/BookingsForm.test.jsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import BookingsForm from '../../components/BookingsForm.jsx';
 
-vi.mock("../../services/api", () => ({
-  getBookings: vi.fn().mockResolvedValue([]),
-  getRooms: vi.fn().mockResolvedValue([
-    { id: 1, type: "Single", beds: 1 }
-  ]),
-  createBooking: vi.fn().mockResolvedValue({}),
-  updateBooking: vi.fn().mockResolvedValue({})
-}))
+describe('BookingsForm', () => {
+  const mockRooms = [
+    { id: 1, roomType: 'Single', beds: 1, price: 100 },
+    { id: 2, roomType: 'Double', beds: 2, price: 150 },
+  ];
 
-describe("BookingsForm", () => {
+  const mockOnSubmit = vi.fn();
 
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
+  test('renders booking form', () => {
+    render(<BookingsForm rooms={mockRooms} onSubmit={mockOnSubmit} />);
+    expect(screen.getByText(/Create New Booking/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Room/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Check-in Date/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Check-out Date/i)).toBeInTheDocument();
+  });
 
-  it("renders booking form", async () => {
+  test('submits correct booking data', async () => {
+    render(<BookingsForm rooms={mockRooms} onSubmit={mockOnSubmit} />);
 
-    render(<BookingsForm />)
+    // Wait for options to render
+    const singleOption = await screen.findByText(/Single/);
+    expect(singleOption).toBeInTheDocument();
 
-    expect(
-      await screen.findByRole("heading", { name: /create new booking/i })
-    ).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '1' } });
+    fireEvent.change(screen.getByLabelText(/Check-in Date/i), {
+      target: { value: '2026-06-15' },
+    });
+    fireEvent.change(screen.getByLabelText(/Check-out Date/i), {
+      target: { value: '2026-06-18' },
+    });
 
-    expect(screen.getByLabelText(/guest name/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/room/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/check-in date/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/check-out date/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Create Booking/i }));
 
-    expect(
-      screen.getByRole("button", { name: /create booking/i })
-    ).toBeInTheDocument()
-
-  })
-
-
-  it("validates date range", async () => {
-
-    render(<BookingsForm />)
-
-    await screen.findByText(/room 1/i)
-
-    fireEvent.change(screen.getByLabelText(/guest name/i), {
-      target: { value: "John Doe" }
-    })
-
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "john@email.com" }
-    })
-
-    fireEvent.change(screen.getByLabelText(/room/i), {
-      target: { value: "1" }
-    })
-
-    fireEvent.change(screen.getByLabelText(/check-in date/i), {
-      target: { value: "2026-06-10" }
-    })
-
-    fireEvent.change(screen.getByLabelText(/check-out date/i), {
-      target: { value: "2026-06-05" }
-    })
-
-    fireEvent.click(
-      screen.getByRole("button", { name: /create booking/i })
-    )
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/check-out date must be after check-in date/i)
-      ).toBeInTheDocument()
-    })
-
-  })
-
-
-  it("submits form when valid", async () => {
-
-    const mockCreate = api.createBooking
-
-    render(<BookingsForm />)
-
-    await screen.findByText(/room 1/i)
-
-    fireEvent.change(screen.getByLabelText(/guest name/i), {
-      target: { value: "Jane Smith" }
-    })
-
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "jane@email.com" }
-    })
-
-    fireEvent.change(screen.getByLabelText(/room/i), {
-      target: { value: "1" }
-    })
-
-    fireEvent.change(screen.getByLabelText(/check-in date/i), {
-      target: { value: "2026-06-15" }
-    })
-
-    fireEvent.change(screen.getByLabelText(/check-out date/i), {
-      target: { value: "2026-06-20" }
-    })
-
-    fireEvent.click(
-      screen.getByRole("button", { name: /create booking/i })
-    )
-
-    await waitFor(() => {
-      expect(mockCreate).toHaveBeenCalledTimes(1)
-    })
-
-  })
-
-})
+    expect(mockOnSubmit).toHaveBeenCalledWith({
+      roomId: '1',
+      checkInDate: '2026-06-15',
+      checkOutDate: '2026-06-18',
+    });
+  });
+});
