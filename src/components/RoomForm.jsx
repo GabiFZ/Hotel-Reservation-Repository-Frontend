@@ -85,60 +85,59 @@ function RoomForm({ existingRoom, onSuccess }) {
                     </Alert>
                 )}
 
-                <Form onSubmit={handleSubmit}>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Room Type</Form.Label>
-                        <Form.Control
-                            value={roomType}
-                            onChange={(e) => setRoomType(e.target.value)}
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label htmlFor="roomType">Room Type</label>
+                        <input
+                        id="roomType"
+                        name="roomType"
+                        type="text"
+                        value={roomType}
+                        onChange={e => setRoomType(e.target.value)}
+                        required
                         />
-                    </Form.Group>
+                    </div>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Beds</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={beds}
-                            onChange={(e) => setBeds(e.target.value)}
+                    <div>
+                        <label htmlFor="beds">Beds</label>
+                        <input
+                        id="beds"
+                        name="beds"
+                        type="number"
+                        value={beds}
+                        onChange={e => setBeds(Number(e.target.value))}
+                        required
                         />
-                    </Form.Group>
+                    </div>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Price</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
+                    <div>
+                        <label htmlFor="price">Price</label>
+                        <input
+                        id="price"
+                        name="price"
+                        type="number"
+                        value={price}
+                        onChange={e => setPrice(Number(e.target.value))}
+                        required
                         />
-                    </Form.Group>
+                    </div>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Status</Form.Label>
-                        <Form.Select
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
+                    <div>
+                        <label htmlFor="status">Status</label>
+                        <select
+                        id="status"
+                        name="status"
+                        value={status}
+                        onChange={e => setStatus(e.target.value)}
+                        required
                         >
-                            <option value="AVAILABLE">AVAILABLE</option>
-                            <option value="OCCUPIED">OCCUPIED</option>
-                        </Form.Select>
-                    </Form.Group>
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="OCCUPIED">OCCUPIED</option>
+                        </select>
+                    </div>
 
-                    <Button variant="primary" type="submit">
-                        {existingRoom ? "Update Room" : "Create Room"}
-                    </Button>
-
-                    {existingRoom && (
-                        <Button
-                            variant="secondary"
-                            className="ms-2"
-                            onClick={() => onSuccess()}
-                        >
-                            Cancel
-                        </Button>
-                    )}
-
-                </Form>
+                    <button type="submit">Create Room</button>
+                    </form>
 
             </Card.Body>
         </Card>

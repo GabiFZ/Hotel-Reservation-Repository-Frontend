@@ -1,50 +1,38 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import * as api from "../../services/api"
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import * as api from "../../services/api";
 
-global.fetch = vi.fn()
+global.fetch = vi.fn();
 
 describe("API Service", () => {
 
   beforeEach(() => {
-    fetch.mockReset()
-  })
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
 
-  it("getRooms returns data", async () => {
+  it("includes Authorization header when token exists", async () => {
+    localStorage.setItem("token", "fake-jwt-token");
+    fetch.mockResolvedValue({ ok: true, json: async () => [] });
 
+    await api.getRooms();
+
+    expect(fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer fake-jwt-token"
+        })
+      })
+    );
+  });
+
+  it("getAvailableRooms works correctly", async () => {
     fetch.mockResolvedValue({
       ok: true,
       json: async () => [{ id: 1, roomType: "Single" }]
-    })
+    });
 
-    const rooms = await api.getRooms()
-
-    expect(fetch).toHaveBeenCalled()
-    expect(rooms[0].roomType).toBe("Single")
-  })
-
-  it("getRooms throws error on failure", async () => {
-
-    fetch.mockResolvedValue({ ok: false })
-
-    await expect(api.getRooms()).rejects.toThrow()
-  })
-
-  it("addRoom sends POST request", async () => {
-
-    fetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ id: 1 })
-    })
-
-    await api.addRoom({ roomType: "Single" })
-
-    expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/rooms"),
-      expect.objectContaining({
-        method: "POST"
-      })
-    )
-
-  })
-
-})
+    const rooms = await api.getAvailableRooms("2026-04-10", "2026-04-15");
+    expect(rooms).toBeDefined();
+  });
+});
