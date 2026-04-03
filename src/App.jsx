@@ -5,13 +5,16 @@ import BookingsForm from "./components/BookingsForm";
 import AvailabilityPage from "./pages/AvailabilityPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
+import ManagerDashboard from "./pages/ManagerDashboard";
 
 export default function App() {
   const [page, setPage] = useState("rooms");
   const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role"); // <--- get role
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("role"); // <--- clear role
     window.location.reload();
   };
 
@@ -24,11 +27,24 @@ export default function App() {
           <nav className="flex gap-3">
             {!token && (
               <>
-                <button onClick={() => setPage("login")} className="border px-4 py-2 rounded">Login</button>
-                <button onClick={() => setPage("register")} className="border px-4 py-2 rounded">Register</button>
+                <button onClick={() => setPage("login")} className="border px-4 py-2 rounded">
+                  Login
+                </button>
+                <button onClick={() => setPage("register")} className="border px-4 py-2 rounded">
+                  Register
+                </button>
               </>
             )}
-            {token && <button onClick={handleLogout} className="border px-4 py-2 rounded text-red-600">Logout</button>}
+            {token && role === "MANAGER" && (
+              <button onClick={() => setPage("manager")} className="border px-4 py-2 rounded">
+                Manager Dashboard
+              </button>
+            )}
+            {token && (
+              <button onClick={handleLogout} className="border px-4 py-2 rounded text-red-600">
+                Logout
+              </button>
+            )}
           </nav>
         </header>
 
@@ -44,6 +60,7 @@ export default function App() {
           {page === "add" && <AddRoomPage />}
           {page === "bookings" && <BookingsForm />}
           {page === "availability" && <AvailabilityPage />}
+          {page === "manager" && role === "MANAGER" && <ManagerDashboard />}
           {page === "login" && <LoginPage />}
           {page === "register" && <RegistrationPage />}
         </div>
