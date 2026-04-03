@@ -15,6 +15,7 @@ export default function LoginForm({ onLoginSuccess }) {
     try {
       const data = await loginUser(email, password);
       localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role); // <-- store role
       onLoginSuccess?.();
     } catch (err) {
       setError(err.message || "Invalid credentials");
