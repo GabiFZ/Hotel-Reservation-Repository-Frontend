@@ -1,6 +1,29 @@
+version: "3.8"
+
 services:
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.test
     command: npm run test:run
+
+  backend:
+    build:
+      context: ./backend   # adjust if your backend folder is different
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: hotel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
